@@ -30,6 +30,10 @@ See the [configuration documentation](CONFIGURATION.md) for setup instructions a
 
 This project is licensed under the MIT License — see [LICENSE](../LICENSE).
 
+## Credits
+Shoutout to https://pictogrammers.com/library/ for the icons
+Props to frigate for the original addon
+
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 [armhf-shield]: https://img.shields.io/badge/armhf-yes-green.svg
