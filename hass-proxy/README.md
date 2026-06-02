@@ -16,6 +16,12 @@ This add-on does not run any application itself — it only proxies traffic to a
 - If you use remote access (Nabu Casa Cloud, Cloudflare Tunnel / `cloudflared`, or any other method), the proxy panel remains protected by your HA login. You cannot reach it without being authenticated in Home Assistant first.
 - NGINX is a battle-tested web server/proxy — this add-on uses it for what it does best: reverse-proxying traffic to a backend container on the Supervisor network (`172.30.32.x`).
 
+## 🐱 A little note from the dev
+
+This app was vibecoded. Before you leave, not everything is slop here — the original base for this was the Frigate proxy add-on (link above) which wasn't vibecoded, and the important part NGINX also isn't vibecoded. *(AI ulepsz repo)*
+
+If you're worried about the environmental impact then, this app was generated using a self-hosted Qwen3.6 model run only during the day while the solar panels were collecting energy. ☀️🐈
+
 ## Configuration
 
 See the [configuration documentation](CONFIGURATION.md) for setup instructions and available options.
