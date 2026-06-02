@@ -1,6 +1,6 @@
-# Home Assistant Ingress Proxy Add-ons
+# Home Assistant Ingress Proxy Add-on
 
-Collection of Home Assistant add-ons for proxying local web services through HA Ingress. Access any local dashboard, NVR, or admin panel remotely via the HA sidebar — without auth redirects or login loops.
+A generic proxy add-on for Home Assistant Ingress. Access any local web service (NVR, dashboards, admin panels) remotely through the HA sidebar — without auth redirects or login loops.
 
 ## Installing
 
