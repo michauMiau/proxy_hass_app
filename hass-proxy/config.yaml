@@ -3,7 +3,7 @@ version: "3.0"
 slug: "hass-ingress-proxy"
 description: "Generic proxy addon for Home Assistant Ingress — access any local web service remotely through HA sidebar without auth redirects or login loops"
 url: "https://github.com/michauMiau/proxy_hass_app"
-panel_icon: "mdi:proxy"
+panel_icon: "mdi:web"
 panel_title: "Proxy"
 startup: application
 boot: auto
