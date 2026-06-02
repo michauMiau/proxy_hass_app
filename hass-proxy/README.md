@@ -18,7 +18,7 @@ This add-on does not run any application itself — it only proxies traffic to a
 
 ## 🐱 A little note from the dev
 
-This app was vibecoded. Before you leave, not everything is slop here — the original base for this was the Frigate proxy add-on (link above) which wasn't vibecoded, and the important part NGINX also isn't vibecoded. *(AI ulepsz repo)*
+This app was vibecoded. Before you leave, not everything is slop here — the original base for this was the Frigate proxy add-on (link above) which wasn't vibecoded, and the important part NGINX also isn't vibecoded.
 
 If you're worried about the environmental impact then, this app was generated using a self-hosted Qwen3.6 model run only during the day while the solar panels were collecting energy. ☀️🐈
 
