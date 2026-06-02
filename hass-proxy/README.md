@@ -1,10 +1,10 @@
-# Home Assistant Add-on: Frigate Proxy
+# Home Assistant Add-on: HA Ingress Proxy
 
 ![Supports aarch64 Architecture][aarch64-shield] ![Supports amd64 Architecture][amd64-shield] ![Supports armhf Architecture][armhf-shield] ![Supports armv7 Architecture][armv7-shield] ![Supports i386 Architecture][i386-shield]
 
-This addon creates a proxy to a Frigate server run separately from Home Assistant so that you can have the benefit of access in the sidebar without running Frigate as an addon.
+A generic proxy addon for Home Assistant Ingress. Access any local web service (NVR, dashboards, admin panels) remotely through the HA sidebar without auth redirects or login loops.
 
-Note that this addon does not run Frigate itself.
+This addon does not run any application itself — it only proxies traffic to a backend server you configure.
 
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg

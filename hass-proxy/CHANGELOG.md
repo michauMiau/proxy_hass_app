@@ -1,3 +1,10 @@
+### 2.0
+
+- **Major refactor**: Renamed from "Frigate Proxy" to "HA Ingress Proxy" — now generic, not tied to any specific application
+- Fix backend auth redirect loops (404 on login pages) by stripping `X-Forwarded-Prefix` header
+- Change `proxy_redirect` from `off` to `default` so nginx properly rewrites backend redirects within ingress context
+- Updated default server URL to generic placeholder (`http://localhost:8080`)
+
 ### 1.6
 
 - Refresh add-on with updated base image and nginx

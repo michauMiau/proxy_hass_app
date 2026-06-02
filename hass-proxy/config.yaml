@@ -1,10 +1,10 @@
-name: Frigate Proxy
-version: 1.6
-panel_icon: "mdi:cctv"
-panel_title: Frigate
-slug: frigate-proxy
-description: Proxy addon for Frigate
-url: "https://github.com/blakeblackshear/frigate"
+name: "HA Ingress Proxy"
+version: "2.0"
+slug: "hass-ingress-proxy"
+description: "Generic proxy addon for Home Assistant Ingress — access any local web service remotely through HA sidebar without auth redirects or login loops"
+url: "https://github.com/michauMiau/proxy_hass_app"
+panel_icon: "mdi:proxy"
+panel_title: "Proxy"
 startup: application
 boot: auto
 init: false
@@ -25,7 +25,7 @@ tmpfs: false
 full_access: false
 environment: {}
 options:
-  server: "http://frigate.local:5000"
+  server: "http://localhost:8080"
   proxy_pass_host: true
   proxy_pass_real_ip: true
 schema:
