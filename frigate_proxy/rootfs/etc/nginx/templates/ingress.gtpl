@@ -3,6 +3,14 @@ server {
 
     include /etc/nginx/includes/server_params.conf;
 
+    # Serve fallback login page if backend redirects to non-existent login.html
+    error_page 404 = @fallback_404;
+
+    location @fallback_404 {
+        root /etc/nginx/servers;
+        try_files /login.html =404;
+    }
+
     location / {
         allow   172.30.32.2;
         deny    all;
