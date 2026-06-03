@@ -1,3 +1,8 @@
+### 4.2
+
+- Remove error_page 404 fallback (login.html JS redirect loop)
+- Set `proxy_redirect off` — stop all redirect rewriting, let backend communicate directly with client
+
 ### 4.1
 
 - Fix nginx startup crash: define `$ingress_path` via `map` directive (was causing "unknown ingress_path variable" error)
