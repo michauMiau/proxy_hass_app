@@ -1,4 +1,12 @@
-### 2.0
+### 4.1
+
+- Fix nginx startup crash: define `$ingress_path` via `map` directive (was causing "unknown ingress_path variable" error)
+
+### 4.0
+
+- Remove custom proxy_redirect rules — LightNVR doesn't redirect, default behavior is sufficient
+
+### 3.0
 
 - **Major refactor**: Renamed from "Frigate Proxy" to "HA Ingress Proxy" — now generic, not tied to any specific application
 - Fix backend auth redirect loops (404 on login pages) by stripping `X-Forwarded-Prefix` header
