@@ -1,3 +1,12 @@
 name: "HA Ingress Proxy"
 url: "https://github.com/michauMiau/proxy_hass_app"
 maintainer: "michauMiau"
+repositories:
+  - name: "HA Ingress Proxy Repository"
+    url: "https://github.com/michauMiau/proxy_hass_app"
+addons:
+  - slug: hass-ingress-proxy
+    name: HA Ingress Proxy
+    version: "4.1"
+    updated: "2026-06-03"
+    url: "https://github.com/michauMiau/proxy_hass_app"
