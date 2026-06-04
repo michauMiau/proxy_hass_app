@@ -1,3 +1,7 @@
+### 4.4
+
+- Remove `map $request_uri $ingress_path` from nginx.conf — this custom variable was causing "unknown ingress_path variable" startup crash; `proxy_redirect default` handles everything automatically without it
+
 ### 4.3
 
 - Restore `proxy_redirect default` — nginx automatically rewrites backend redirects to match the ingress path, fixing `/login.html` → `/api/hassio_ingress/<token>/login.html` without custom variables or startup crashes
