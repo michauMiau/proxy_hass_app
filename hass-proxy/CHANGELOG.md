@@ -1,3 +1,7 @@
+### 4.3
+
+- Restore `proxy_redirect default` — nginx automatically rewrites backend redirects to match the ingress path, fixing `/login.html` → `/api/hassio_ingress/<token>/login.html` without custom variables or startup crashes
+
 ### 4.2
 
 - Remove error_page 404 fallback (login.html JS redirect loop)
