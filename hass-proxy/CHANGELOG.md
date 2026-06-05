@@ -1,7 +1,6 @@
 ### 5.0
 
-- **Reset to original Frigate Proxy baseline**: `proxy_redirect off;`, standard headers (`Host`, `X-Forwarded-For`, `X-Real-IP`), no redirect rewriting, no X-Forwarded-Prefix stripping. This is the config that worked for Frigate and should work generically — let backend communicate directly with client without nginx interfering
-- Major version bump because all previous redirect hacks are removed
+- Add `proxy_cookie_path / "/";` and `proxy_cookie_domain off;` to forward LightNVR session cookies through the ingress proxy without path/domain modification, fixing auth short-circuits that cause 404 instead of login screen
 
 ### 4.9
 
