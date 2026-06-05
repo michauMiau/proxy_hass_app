@@ -1,3 +1,7 @@
+### 4.7
+
+- Fix nginx startup crash: remove invalid `proxy_redirect = / /;` directive (the `=` modifier expects an HTTP status code, not a path)
+
 ### 4.6
 
 - Fix redirect handling: rewrite absolute backend redirects to relative paths so nginx keeps them under the ingress prefix (`/api/hassio_ingress/<token>/...`), fixes double-slash `//` issue and broken login redirects
