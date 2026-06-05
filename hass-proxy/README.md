@@ -16,7 +16,15 @@ This add-on does not run any application itself, it only proxies traffic to a ba
 - If you use remote access (Nabu Casa Cloud, Cloudflare Tunnel / `cloudflared`, or any other method), the proxy panel remains protected by your HA login. You cannot reach it without being authenticated in Home Assistant first.
 - NGINX is a battle-tested web server/proxy — this add-on uses it for what it does best: reverse-proxying traffic to a backend container on the Supervisor network (`172.30.32.x`).
 
-## 🐱 A little note from the dev
+## Trusted networks / CIDR gotcha
+
+If your backend service (LightNVR, Frigate, Synology DSM, whatever) shows a login page or 404 even though you're logged into Home Assistant, this is usually the problem.
+
+When traffic goes through HA Ingress, it comes from `172.30.32.x` — that's Docker's internal network for addons. To your backend service, that looks like an unknown IP trying to access protected resources. Most NVRs and dashboards have a "trusted networks" or "allowed CIDR" setting and they reject anything outside their LAN range.
+
+**Fix:** add `172.30.0.0/16` (or at least `172.30.32.0/24`) to the trusted networks / allowed IPs list in your backend service's settings. For LightNVR that's in the network configuration section. For Frigate it's under `trusted_networks` in `config.yaml`.
+
+If your service doesn't have a trusted networks setting and you're desperate, you can set `host_network: true` in this addon's config. That gives the proxy a real LAN IP instead of a Docker one, so the backend sees it as "local traffic". Less secure but it works.
 
 This app was vibecoded. Before you leave, not everything is slop here, the original base for this was the Frigate proxy add-on (link above) which wasn't vibecoded, and the important part NGINX also isn't vibecoded.
 
