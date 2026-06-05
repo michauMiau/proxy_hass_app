@@ -1,3 +1,8 @@
+### 4.6
+
+- Fix redirect handling: rewrite absolute backend redirects to relative paths so nginx keeps them under the ingress prefix (`/api/hassio_ingress/<token>/...`), fixes double-slash `//` issue and broken login redirects
+- Remove `$host` from first `proxy_redirect` argument (was matching client host, not backend internal IP)
+
 ### 4.5
 
 - Remove duplicate `proxy_redirect http://$host/ /;` line (was accidentally doubled in v4.4)
