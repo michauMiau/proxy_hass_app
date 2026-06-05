@@ -1,3 +1,7 @@
+### 4.9
+
+- Fix nginx startup crash: restore `ingress: true` in config.yaml (setting it to `false` caused HA to skip passing `.entry` variable to the nginx template, resulting in `proxy_set_header X-Ingress-Path ;` with no value)
+
 ### 4.7
 
 - Fix nginx startup crash: remove invalid `proxy_redirect = / /;` directive (the `=` modifier expects an HTTP status code, not a path)

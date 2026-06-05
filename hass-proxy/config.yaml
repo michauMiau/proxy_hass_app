@@ -1,5 +1,5 @@
 name: "HA Ingress Proxy"
-version: "4.8"
+version: "4.9"
 slug: "hass-ingress-proxy"
 description: "Generic proxy addon for Home Assistant Ingress — access any local web service remotely through HA sidebar without auth redirects or login loops"
 url: "https://github.com/michauMiau/proxy_hass_app"
@@ -10,7 +10,7 @@ boot: auto
 init: false
 webui: "http://[HOST]:[PORT:5000]/"
 watchdog: "http://[HOST]:[PORT:5000]/"
-ingress: false
+ingress: true
 ingress_port: 5000
 ingress_entry: /
 panel_admin: true
