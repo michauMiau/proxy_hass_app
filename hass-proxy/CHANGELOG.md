@@ -1,3 +1,7 @@
+### 4.5
+
+- Remove duplicate `proxy_redirect http://$host/ /;` line (was accidentally doubled in v4.4)
+
 ### 4.4
 
 - Remove `map $request_uri $ingress_path` from nginx.conf — this custom variable was causing "unknown ingress_path variable" startup crash; `proxy_redirect default` handles everything automatically without it
