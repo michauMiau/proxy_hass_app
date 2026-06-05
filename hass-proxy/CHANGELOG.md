@@ -1,3 +1,8 @@
+### 5.0
+
+- **Reset to original Frigate Proxy baseline**: `proxy_redirect off;`, standard headers (`Host`, `X-Forwarded-For`, `X-Real-IP`), no redirect rewriting, no X-Forwarded-Prefix stripping. This is the config that worked for Frigate and should work generically — let backend communicate directly with client without nginx interfering
+- Major version bump because all previous redirect hacks are removed
+
 ### 4.9
 
 - Fix nginx startup crash: restore `ingress: true` in config.yaml (setting it to `false` caused HA to skip passing `.entry` variable to the nginx template, resulting in `proxy_set_header X-Ingress-Path ;` with no value)
