@@ -1,3 +1,7 @@
+### 5.1
+
+- Set `host_network: true` by default — proxy gets a real LAN IP (192.168.1.x) instead of Docker internal, so LightNVR treats it as local traffic and doesn't require session cookies through ingress
+
 ### 5.0
 
 - Add `proxy_cookie_path / "/";` and `proxy_cookie_domain off;` to forward LightNVR session cookies through the ingress proxy without path/domain modification, fixing auth short-circuits that cause 404 instead of login screen
