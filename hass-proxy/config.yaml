@@ -1,5 +1,5 @@
 name: "HA Ingress Proxy"
-version: "5.1"
+version: "5.2"
 slug: "hass-ingress-proxy"
 description: "Generic proxy addon for Home Assistant Ingress — access any local web service remotely through HA sidebar without auth redirects or login loops"
 url: "https://github.com/michauMiau/proxy_hass_app"
@@ -25,11 +25,12 @@ tmpfs: false
 full_access: false
 environment: {}
 options:
+  ingress_entry: /
   server: "http://localhost:8080"
   proxy_pass_host: true
   proxy_pass_real_ip: true
 schema:
-  server: "match(^https?://.+:\\d+$)"
+  server: "match(^https?://.+:\d+(/.*)?$)"
   proxy_pass_host: bool
   proxy_pass_real_ip: bool
 services: []
