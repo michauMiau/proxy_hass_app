@@ -26,9 +26,10 @@ When traffic goes through HA Ingress, it comes from `172.30.32.x` — that's Doc
 
 If your service doesn't have a trusted networks setting and you're desperate, you can set `host_network: true` in this addon's config. That gives the proxy a real LAN IP instead of a Docker one, so the backend sees it as "local traffic". Less secure but it works.
 
+## Note
 This app was vibecoded. Before you leave, not everything is slop here, the original base for this was the Frigate proxy add-on (link above) which wasn't vibecoded, and the important part NGINX also isn't vibecoded.
 
-If you're worried about the environmental impact then, this app was generated using a self-hosted Qwen3.6 model run only during the day while the solar panels were collecting energy. ☀️🐈
+If you're worried about the environmental impact of this app then, this app was developed using a self-hosted Qwen3.6 model run only during the day while the solar panels were collecting energy. ☀️🛰️🐈
 
 ## Configuration
 
@@ -39,11 +40,13 @@ See the [configuration documentation](CONFIGURATION.md) for setup instructions a
 This project is licensed under the MIT License — see [LICENSE](../LICENSE).
 
 ## Credits
+
 Shoutout to https://pictogrammers.com/library/ for the icons
-Props to frigate for the original addon
+
+Props to [Frigate](https://github.com/blakeblackshear/frigate) for the original [add-on](https://github.com/blakeblackshear/frigate/tree/master/docker/frigate-proxy)
 
 [aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 [armhf-shield]: https://img.shields.io/badge/armhf-yes-green.svg
 [armv7-shield]: https://img.shields.io/badge/armv7-yes-green.svg
-[i386-shield]: https://img.shields.io/badge/i386-yes-green.svg
+[i386-shield]: https://img.shields.io/badge/i386-no-red.svg
