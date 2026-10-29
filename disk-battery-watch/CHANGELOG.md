@@ -1,3 +1,8 @@
+### 1.0.1
+
+- s6 service type fixed: `longrun`, not `long-run` (Supervisor caches the built image by version, so the broken first build kept running after the repo pull)
+- `mqtt_password` uses the Supervisor `password` schema type, so the value is masked in the UI, API and logs
+
 ### 1.0.0
 
 - Initial release: modern replacement for the 2020-era HDD Tools approach

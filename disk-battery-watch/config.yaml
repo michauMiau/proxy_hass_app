@@ -1,5 +1,5 @@
 name: "Disk & Battery Watch"
-version: "1.0.0"
+version: "1.0.1"
 slug: "disk-battery-watch"
 description: "Monitors disk S.M.A.R.T. health and battery/UPS status on the host. Structured smartctl JSON parsing, MQTT discovery entities with REST fallback"
 url: "https://github.com/michauMiau/proxy_hass_app"
@@ -42,4 +42,4 @@ schema:
   mqtt_host: str
   mqtt_port: "int(1,65535)"
   mqtt_username: str
-  mqtt_password: str
+  mqtt_password: password

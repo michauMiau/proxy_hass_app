@@ -46,7 +46,7 @@ Per power supply (`/sys/class/power_supply`, `Battery` and `UPS` types only):
 | `mqtt_enabled` | `true` | Use MQTT discovery. |
 | `mqtt_host` | `core-mqtt` | Broker host. The MQTT core add-on resolves under this name inside HA OS. |
 | `mqtt_port` | `1883` | Broker port (plain TCP, no TLS). |
-| `mqtt_username` / `mqtt_password` | empty | Only needed when the broker requires auth. |
+| `mqtt_username` / `mqtt_password` | empty | Only needed when the broker requires auth. Supervisor treats the password as a secret and masks it everywhere. |
 
 ## Caveats
 
