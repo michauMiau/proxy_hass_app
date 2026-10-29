@@ -1,6 +1,6 @@
-# Home Assistant Ingress Proxy Add-on
+# HA Add-on Repository
 
-A generic proxy add-on for Home Assistant Ingress. Access any local web service (NVR, dashboards, admin panels) remotely through the HA sidebar — without auth redirects or login loops.
+Add-ons for Home Assistant Supervisor.
 
 ## Installing
 
@@ -12,4 +12,6 @@ Or manually: _Configuration_ → _Add-ons, Backups & Supervisor_ → _Add-on Sto
 
 ## Add-ons
 
-- **[HA Ingress Proxy](hass-proxy/README.md)** — Generic proxy for any local web service. Access NVRs, dashboards, admin panels through HA sidebar without auth redirect issues.
+- **[HA Ingress Proxy](hass-proxy/README.md)** (`hass-ingress-proxy`). Generic proxy for any local web service. Access NVRs, dashboards, admin panels through HA sidebar without auth redirect issues.
+- **[Disk & Battery Watch](disk-battery-watch/README.md)** (`disk-battery-watch`). SMART disk health and battery/UPS status as Home Assistant entities. Parses `smartctl --json` output directly, publishes MQTT discovery entities, and falls back to REST states when no broker is reachable.
+
