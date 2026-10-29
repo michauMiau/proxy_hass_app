@@ -35,11 +35,11 @@ options:
 schema:
   disks:
     - "device(subsystem=block)"
-  check_interval: "between(30,86400)"
-  battery_interval: "between(10,3600)"
+  check_interval: "int(30,86400)"
+  battery_interval: "int(10,3600)"
   publish_attributes: bool
   mqtt_enabled: bool
   mqtt_host: str
-  mqtt_port: "between(1,65535)"
+  mqtt_port: "int(1,65535)"
   mqtt_username: str
   mqtt_password: str
