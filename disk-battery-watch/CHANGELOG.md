@@ -1,3 +1,9 @@
+### 1.0.2
+
+- `hassio_api: true` added — the Supervisor proxy rejects REST calls from add-ons without this permission (401 Unauthorized, source: api/proxy.py `_check_access` requires `access_homeassistant_api`)
+- Entity object ids now follow the kernel device name, so `disks` entries under `/dev/disk/by-id` give short ids like `dw_sda_*`
+- Unresolvable MQTT host logs a broker hint instead of a bare errno, then falls back to REST
+
 ### 1.0.1
 
 - s6 service type fixed: `longrun`, not `long-run` (Supervisor caches the built image by version, so the broken first build kept running after the repo pull)

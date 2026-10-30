@@ -35,6 +35,8 @@ Per power supply (`/sys/class/power_supply`, `Battery` and `UPS` types only):
 
 **REST fallback**: when `mqtt_enabled` is true but the broker is unreachable, entities are pushed through Supervisor's REST API instead (`/api/states`). Those entities have no device classes, so keep MQTT enabled if you want energy/statistics-friendly sensors.
 
+If you have no MQTT add-on installed, the default host `core-mqtt` does not resolve and every cycle logs one fallback message. Install the MQTT integration or MQTT core add-on, set `mqtt_host` to your external broker, or set `mqtt_enabled: false` to skip the attempt entirely.
+
 ## Configuration
 
 | Option | Default | Description |

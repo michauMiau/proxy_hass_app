@@ -113,11 +113,14 @@ def raw_value(attr):
 
 
 def build_disk_entities(device, data, options):
-    key = sanitize(os.path.basename(device))
+    # smartctl reports the kernel device name, so a /dev/disk/by-id option
+    # still produces a short entity object id (dw_sda_* not dw_by-id_*).
+    real_name = (data.get("device") or {}).get("name") or device
+    key = sanitize(os.path.basename(real_name))
     serial = (data.get("serial_number") or "").strip()
     model = (data.get("model_name") or "").strip()
     ident = sanitize(serial) or key
-    display = model or os.path.basename(device)
+    display = model or os.path.basename(real_name)
     device_info = {"identifiers": [f"disk-watch-{ident}"], "name": display}
     if model:
         device_info["model"] = model
@@ -513,6 +516,12 @@ class Publisher:
             try:
                 mqtt_publish(self.options, messages)
                 return
+            except socket.gaierror:
+                log(
+                    f"MQTT host '{self.options['mqtt_host']}' is not resolvable "
+                    "(no MQTT broker running?), switching to REST states"
+                )
+                self.mode = "rest"
             except (OSError, RuntimeError) as err:
                 log(f"MQTT publish failed ({err}), switching to REST states")
                 self.mode = "rest"
