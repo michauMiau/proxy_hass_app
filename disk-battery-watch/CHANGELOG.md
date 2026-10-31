@@ -1,3 +1,9 @@
+### 1.0.4
+
+- Startup line now shows the resolved MQTT target and where credentials came from (Supervisor service, manual, or anonymous)
+- Broker refusals print human text, e.g. CONNACK code 5 becomes "authentication required, set broker credentials or add a login"
+- Successful first MQTT publish logs "MQTT discovery live", REST 401 failures add a repo-refresh hint
+
 ### 1.0.3
 
 - MQTT broker auto-discovery via Supervisor services (`services: mqtt:want` + `GET /services/mqtt`). Mosquitto registers the broker host, port and credentials as `mqtt:provide`, so `mqtt_host` can stay at its default and no credentials need typing by hand

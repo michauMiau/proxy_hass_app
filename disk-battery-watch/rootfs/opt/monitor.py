@@ -27,6 +27,14 @@ SUPERVISOR_API = os.environ.get("SUPERVISOR_API", "http://supervisor")
 
 _SKIP_BLOCK_PREFIXES = ("sr", "sg", "loop", "ram", "zram", "dm-", "md")
 
+CONNACK_CODES = {
+    1: "unacceptable protocol version",
+    2: "identifier rejected",
+    3: "bad username or password",
+    4: "broker unavailable",
+    5: "authentication required, set broker credentials or add a login",
+}
+
 
 def log(message):
     print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] {message}", flush=True)
@@ -456,7 +464,8 @@ def mqtt_publish(settings, messages):
 
         connack = _recv_exact(sock, 4)  # header, length, session flags, reason code
         if connack[0] != 0x20 or connack[3] != 0x00:
-            raise RuntimeError(f"MQTT CONNACK refused, code {connack[3]}")
+            reason = CONNACK_CODES.get(connack[3], f"code {connack[3]}")
+            raise RuntimeError(f"MQTT CONNACK refused: {reason}")
 
         for topic, payload, retain in messages:
             topic_bytes = topic.encode("utf-8")
@@ -534,6 +543,7 @@ class Publisher:
         self.mqtt_enabled = options["mqtt_enabled"]
         self.delivered_configs = set()
         self.mqtt_fail_streak = 0
+        self.live_logged = False
 
     def publish(self, entities):
         if self.mqtt_enabled:
@@ -561,6 +571,9 @@ class Publisher:
                 mqtt_publish(settings, messages)
                 self.delivered_configs.update(pending_configs)
                 self.mqtt_fail_streak = 0
+                if not self.live_logged:
+                    self.live_logged = True
+                    log(f"MQTT discovery live ({settings['host']}:{settings['port']})")
                 return
             except socket.gaierror:
                 hint = (
@@ -581,6 +594,11 @@ class Publisher:
             except (OSError, RuntimeError) as err:
                 if failures == 0:
                     log(f"REST state failed for {entity_id}: {err}")
+                    if "401" in str(err):
+                        log(
+                            "REST 401 means Supervisor did not grant the hassio_api permission, "
+                            "refresh the repository and install the latest add-on version"
+                        )
                 failures += 1
         if failures > 1:
             log(f"{failures - 1} more REST states failed this cycle")
@@ -588,10 +606,19 @@ class Publisher:
 
 def main():
     options = load_options()
+    service = discover_mqtt_service()
+    settings = mqtt_settings(options, service)
+    if service and settings["username"] == service.get("username"):
+        creds = "service-provided"
+    elif settings["username"]:
+        creds = "manual"
+    else:
+        creds = "anonymous"
     log(
         f"Disk & Battery Watch started (disks={options['disks'] or 'auto'}, "
         f"smart every {options['check_interval']} s, battery every {options['battery_interval']} s, "
-        f"entity mode={'mqtt' if options['mqtt_enabled'] else 'rest'})"
+        f"entity mode={'mqtt' if options['mqtt_enabled'] else 'rest'}, "
+        f"mqtt target {settings['host']}:{settings['port']} ({creds})"
     )
     publisher = Publisher(options)
     now = time.monotonic()
