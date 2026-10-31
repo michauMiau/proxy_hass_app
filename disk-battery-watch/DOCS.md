@@ -31,11 +31,11 @@ Per power supply (`/sys/class/power_supply`, `Battery` and `UPS` types only):
 
 ## Entity publishing mode
 
-**MQTT discovery** (default) creates registry entities with device classes and statistics. Set `mqtt_enabled: false` to skip MQTT entirely.
+**MQTT discovery** (default) creates registry entities with device classes and statistics. The broker is auto-discovered from Supervisor's MQTT service, so with the Mosquitto core add-on running you do not have to set host, port, username or password at all. Set `mqtt_enabled: false` to skip MQTT entirely.
 
-**REST fallback**: when `mqtt_enabled` is true but the broker is unreachable, entities are pushed through Supervisor's REST API instead (`/api/states`). Those entities have no device classes, so keep MQTT enabled if you want energy/statistics-friendly sensors.
+**REST fallback**: when `mqtt_enabled` is true but the broker is unreachable, entities are pushed through Supervisor's REST API instead (`/api/states`). Those entities have no device classes, MQTT is retried on every cycle, and installing the broker later takes effect without an add-on restart.
 
-If you have no MQTT add-on installed, the default host `core-mqtt` does not resolve and every cycle logs one fallback message. Install the MQTT integration or MQTT core add-on, set `mqtt_host` to your external broker, or set `mqtt_enabled: false` to skip the attempt entirely.
+Manual options (`mqtt_host`, `mqtt_port`, credentials) act as the fallback when no MQTT service is registered, e.g. an external broker on another machine. Credential fields typed by hand take precedence over service data.
 
 ## Configuration
 

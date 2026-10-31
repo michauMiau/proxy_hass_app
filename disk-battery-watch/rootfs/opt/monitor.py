@@ -23,6 +23,7 @@ POWER_SUPPLY_ROOT = os.environ.get(
 BLOCK_ROOT = os.environ.get("DISK_WATCH_BLOCK_ROOT", "/sys/block")
 PREFIX = "hass_disk_watch"
 HASS_API = os.environ.get("HASS_API", "http://supervisor/core/api")
+SUPERVISOR_API = os.environ.get("SUPERVISOR_API", "http://supervisor")
 
 _SKIP_BLOCK_PREFIXES = ("sr", "sg", "loop", "ram", "zram", "dm-", "md")
 
@@ -431,11 +432,9 @@ def _recv_exact(sock, count):
     return buf
 
 
-def mqtt_publish(options, messages):
+def mqtt_publish(settings, messages):
     """Publish (topic, payload, retain) tuples over one MQTT 3.1.1 session, QoS 0."""
-    sock = socket.create_connection(
-        (options["mqtt_host"], options["mqtt_port"]), timeout=10
-    )
+    sock = socket.create_connection((settings["host"], settings["port"]), timeout=10)
     try:
         flags = 0
         connect_payload = bytearray()
@@ -445,12 +444,12 @@ def mqtt_publish(options, messages):
             connect_payload.extend(len(encoded).to_bytes(2, "big") + encoded)
 
         add_string(f"hass-disk-watch-{os.getpid()}")
-        if options["mqtt_username"]:
+        if settings["username"]:
             flags |= 0x80
-            add_string(options["mqtt_username"])
-        if options["mqtt_password"]:
+            add_string(settings["username"])
+        if settings["password"]:
             flags |= 0x40
-            add_string(options["mqtt_password"])
+            add_string(settings["password"])
 
         variable = b"\x00\x04MQTT\x04" + bytes([flags, 30, 0]) + connect_payload
         sock.sendall(b"\x10" + _mqtt_varint(len(variable)) + variable)
@@ -487,18 +486,63 @@ def rest_set_state(entity_id, state, attributes):
     urllib.request.urlopen(request, timeout=10)
 
 
+def discover_mqtt_service():
+    """Return broker details registered in Supervisor's MQTT service.
+
+    Mosquitto (core MQTT add-on) declares services: [mqtt:provide], so the
+    provider data (host, port, credentials) is authoritative for add-ons.
+    Returns None when no provider is registered or the lookup fails.
+    """
+    token = os.environ.get("SUPERVISOR_TOKEN")
+    if not token:
+        return None
+    try:
+        request = urllib.request.Request(
+            f"{SUPERVISOR_API}/services/mqtt",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        payload = json.loads(urllib.request.urlopen(request, timeout=10).read())
+    except (OSError, ValueError):
+        return None
+    if not payload.get("host"):
+        return None
+    return payload
+
+
+def mqtt_settings(options, service):
+    """Merge manual options with the Supervisor MQTT service (service wins)."""
+    settings = {
+        "host": options["mqtt_host"],
+        "port": options["mqtt_port"],
+        "username": options["mqtt_username"],
+        "password": options["mqtt_password"],
+    }
+    if service:
+        settings["host"] = service["host"]
+        settings["port"] = int(service.get("port") or settings["port"])
+        username = service.get("username")
+        password = service.get("password")
+        if not settings["username"] and username and password:
+            settings["username"] = username
+            settings["password"] = password
+    return settings
+
+
 class Publisher:
     def __init__(self, options):
         self.options = options
-        self.mode = "mqtt" if options["mqtt_enabled"] else "rest"
-        self.published_configs = set()
+        self.mqtt_enabled = options["mqtt_enabled"]
+        self.delivered_configs = set()
+        self.mqtt_fail_streak = 0
 
     def publish(self, entities):
-        if self.mode == "mqtt":
+        if self.mqtt_enabled:
+            settings = mqtt_settings(self.options, discover_mqtt_service())
             messages = []
+            pending_configs = []
             for entity in entities:
                 obj = entity["obj"]
-                if obj not in self.published_configs:
+                if obj not in self.delivered_configs:
                     messages.append(
                         (
                             f"homeassistant/{entity['domain']}/{obj}/config",
@@ -506,25 +550,28 @@ class Publisher:
                             True,
                         )
                     )
-                    self.published_configs.add(obj)
+                    pending_configs.append(obj)
                 attrs_topic = entity["config"].get("json_attributes_topic")
                 if attrs_topic and entity.get("attrs") is not None:
-                    messages.append(
-                        (attrs_topic, json.dumps(entity["attrs"]), True)
-                    )
-                messages.append((entity["config"]["state_topic"], str(entity["value"]), True))
+                    messages.append((attrs_topic, json.dumps(entity["attrs"]), True))
+                messages.append(
+                    (entity["config"]["state_topic"], str(entity["value"]), True)
+                )
             try:
-                mqtt_publish(self.options, messages)
+                mqtt_publish(settings, messages)
+                self.delivered_configs.update(pending_configs)
+                self.mqtt_fail_streak = 0
                 return
             except socket.gaierror:
-                log(
-                    f"MQTT host '{self.options['mqtt_host']}' is not resolvable "
-                    "(no MQTT broker running?), switching to REST states"
+                hint = (
+                    f"MQTT host '{settings['host']}' is not resolvable "
+                    "(no MQTT broker running?)"
                 )
-                self.mode = "rest"
             except (OSError, RuntimeError) as err:
-                log(f"MQTT publish failed ({err}), switching to REST states")
-                self.mode = "rest"
+                hint = f"MQTT publish failed ({err})"
+            self.mqtt_fail_streak += 1
+            if self.mqtt_fail_streak == 1 or self.mqtt_fail_streak % 10 == 0:
+                log(f"{hint}; using REST states, retrying MQTT next cycle")
 
         failures = 0
         for entity in entities:

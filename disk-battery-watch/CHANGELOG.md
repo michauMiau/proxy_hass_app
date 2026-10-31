@@ -1,3 +1,9 @@
+### 1.0.3
+
+- MQTT broker auto-discovery via Supervisor services (`services: mqtt:want` + `GET /services/mqtt`). Mosquitto registers the broker host, port and credentials as `mqtt:provide`, so `mqtt_host` can stay at its default and no credentials need typing by hand
+- MQTT failures no longer stick forever in REST mode; the REST states ship each cycle while MQTT retries, so installing the broker later needs no add-on restart
+- Config-only MQTT hint logs throttled to the first cycle and every tenth failure
+
 ### 1.0.2
 
 - `hassio_api: true` added — the Supervisor proxy rejects REST calls from add-ons without this permission (401 Unauthorized, source: api/proxy.py `_check_access` requires `access_homeassistant_api`)
