@@ -1,5 +1,5 @@
 name: "Disk & Battery Watch"
-version: "1.0.4"
+version: "1.0.5"
 slug: "disk-battery-watch"
 description: "Monitors disk S.M.A.R.T. health and battery/UPS status on the host. Structured smartctl JSON parsing, MQTT discovery entities with REST fallback"
 url: "https://github.com/michauMiau/proxy_hass_app"
@@ -13,7 +13,8 @@ homeassistant: "2024.10.0"
 startup: system
 boot: auto
 init: false
-hassio_api: true
+hassio_api: false
+homeassistant_api: true
 privileged:
   - SYS_ADMIN
   - SYS_RAWIO

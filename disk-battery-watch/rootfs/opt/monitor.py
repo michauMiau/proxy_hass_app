@@ -608,6 +608,10 @@ def main():
     options = load_options()
     service = discover_mqtt_service()
     settings = mqtt_settings(options, service)
+    if service:
+        log(f"MQTT service registered by Supervisor: {service['host']}:{service.get('port', 1883)}")
+    elif options["mqtt_enabled"]:
+        log("No MQTT service in Supervisor registry, using mqtt_host option")
     if service and settings["username"] == service.get("username"):
         creds = "service-provided"
     elif settings["username"]:

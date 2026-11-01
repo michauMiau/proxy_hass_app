@@ -1,3 +1,8 @@
+### 1.0.5
+
+- REST proxy permission corrected: the /core/api proxy gates on `homeassistant_api`, not `hassio_api` (apps/model.py `access_homeassistant_api` reads `ATTR_HOMEASSISTANT_API`), so 401 kept standing even with hassio_api granted. `hassio_api` back to false, `homeassistant_api: true` added
+- Startup logs say whether the Supervisor MQTT service registry is present, distinguishing "broker not registered" from "option fallback"
+
 ### 1.0.4
 
 - Startup line now shows the resolved MQTT target and where credentials came from (Supervisor service, manual, or anonymous)
