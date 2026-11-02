@@ -1,3 +1,7 @@
+### 1.0.6
+
+- MQTT service lookup prints the real failure reason at startup instead of staying silent, e.g. "Service not enabled" (HTTP 500) when the Mosquitto app is installed but not running. Retry cycles stay quiet
+
 ### 1.0.5
 
 - REST proxy permission corrected: the /core/api proxy gates on `homeassistant_api`, not `hassio_api` (apps/model.py `access_homeassistant_api` reads `ATTR_HOMEASSISTANT_API`), so 401 kept standing even with hassio_api granted. `hassio_api` back to false, `homeassistant_api: true` added

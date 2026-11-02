@@ -14,6 +14,7 @@ import re
 import socket
 import subprocess
 import time
+import urllib.error
 import urllib.request
 
 OPTIONS_PATH = os.environ.get("DISK_WATCH_OPTIONS", "/data/options.json")
@@ -495,12 +496,13 @@ def rest_set_state(entity_id, state, attributes):
     urllib.request.urlopen(request, timeout=10)
 
 
-def discover_mqtt_service():
+def discover_mqtt_service(quiet=False):
     """Return broker details registered in Supervisor's MQTT service.
 
     Mosquitto (core MQTT add-on) declares services: [mqtt:provide], so the
     provider data (host, port, credentials) is authoritative for add-ons.
     Returns None when no provider is registered or the lookup fails.
+    quiet=False prints the failure detail, quiet=True stays silent.
     """
     token = os.environ.get("SUPERVISOR_TOKEN")
     if not token:
@@ -511,7 +513,14 @@ def discover_mqtt_service():
             headers={"Authorization": f"Bearer {token}"},
         )
         payload = json.loads(urllib.request.urlopen(request, timeout=10).read())
-    except (OSError, ValueError):
+    except urllib.error.HTTPError as err:
+        if not quiet:
+            body = err.read().decode(errors="replace")[:160]
+            log(f"MQTT service lookup failed: HTTP {err.code} {body}")
+        return None
+    except (OSError, ValueError) as err:
+        if not quiet:
+            log(f"MQTT service lookup failed: {err}")
         return None
     if not payload.get("host"):
         return None
@@ -547,7 +556,7 @@ class Publisher:
 
     def publish(self, entities):
         if self.mqtt_enabled:
-            settings = mqtt_settings(self.options, discover_mqtt_service())
+            settings = mqtt_settings(self.options, discover_mqtt_service(quiet=True))
             messages = []
             pending_configs = []
             for entity in entities:
