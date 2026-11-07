@@ -590,7 +590,13 @@ class Publisher:
                     "(no MQTT broker running?)"
                 )
             except (OSError, RuntimeError) as err:
-                hint = f"MQTT publish failed ({err})"
+                if isinstance(err, ConnectionResetError) or getattr(err, "errno", None) == 32:
+                    hint = (
+                        "MQTT broker closed the connection during publish, "
+                        "credentials were rejected or the broker ACL denies this topic"
+                    )
+                else:
+                    hint = f"MQTT publish failed ({err})"
             self.mqtt_fail_streak += 1
             if self.mqtt_fail_streak == 1 or self.mqtt_fail_streak % 10 == 0:
                 log(f"{hint}; using REST states, retrying MQTT next cycle")

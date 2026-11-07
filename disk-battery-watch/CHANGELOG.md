@@ -1,3 +1,7 @@
+### 1.0.8
+
+- Broken pipe and connection-reset failures during MQTT publish now print "broker closed the connection, credentials were rejected or the broker ACL denies this topic" instead of a bare errno
+
 ### 1.0.6
 
 - MQTT service lookup prints the real failure reason at startup instead of staying silent, e.g. "Service not enabled" (HTTP 500) when the Mosquitto app is installed but not running. Retry cycles stay quiet
