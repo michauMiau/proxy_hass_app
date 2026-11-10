@@ -472,7 +472,8 @@ def mqtt_publish(settings, messages):
             topic_bytes = topic.encode("utf-8")
             payload_bytes = payload.encode("utf-8")
             variable = len(topic_bytes).to_bytes(2, "big") + topic_bytes + payload_bytes
-            packet_type = 0x20 | (0x01 if retain else 0x00)
+            # MQTT packet types: CONNECT=1, CONNACK=2, PUBLISH=3.
+            packet_type = 0x30 | (0x01 if retain else 0x00)
             sock.sendall(bytes([packet_type]) + _mqtt_varint(len(variable)) + variable)
     finally:
         sock.close()
