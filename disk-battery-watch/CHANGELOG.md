@@ -1,3 +1,7 @@
+### 1.0.9
+
+- Fixed the real bug behind "Broken pipe": PUBLISH packets used header 0x20, but MQTT packet type 3 is PUBLISH and 0x20 is CONNACK. Mosquitto accepted CONNECT and closed the session as protocol error on the publish stream. Reproduced against real mosquitto 2.0.21 and verified after the fix, Received PUBLISH logged for configs, attrs and states
+
 ### 1.0.8
 
 - Broken pipe and connection-reset failures during MQTT publish now print "broker closed the connection, credentials were rejected or the broker ACL denies this topic" instead of a bare errno
