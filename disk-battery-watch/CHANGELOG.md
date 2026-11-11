@@ -1,3 +1,8 @@
+### 1.0.10
+
+- More disk detail: full SMART attribute table now includes attribute ids and is kept in JSON attributes; health attributes also expose capacity, rotation rate, form factor, SATA/protocol, firmware, self-test status and NVMe log fields
+- Extra disk sensors: ATA power cycles, offline uncorrectable, reported uncorrectable, reallocated events, UDMA CRC errors, command timeouts; NVMe power cycles, available spare and threshold, critical warning, unsafe shutdowns, error log entries, controller busy time, data written/read in TB
+
 ### 1.0.9
 
 - Fixed the real bug behind "Broken pipe": PUBLISH packets used header 0x20, but MQTT packet type 3 is PUBLISH and 0x20 is CONNACK. Mosquitto accepted CONNECT and closed the session as protocol error on the publish stream. Reproduced against real mosquitto 2.0.21 and verified after the fix, Received PUBLISH logged for configs, attrs and states

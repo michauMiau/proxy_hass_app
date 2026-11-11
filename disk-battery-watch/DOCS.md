@@ -11,13 +11,29 @@ Per disk (auto-discovered or configured):
 | `binary_sensor.dw_<disk>_health` | problem | `true` when SMART failed, errored, or NVMe critical warning set |
 | `sensor.dw_<disk>_temperature` | temperature | °C |
 | `sensor.dw_<disk>_power_on_hours` | duration | hours |
-| `sensor.dw_<disk>_reallocated` | sectors | SATA only, attribute ID 5 |
-| `sensor.dw_<disk>_pending` | sectors | SATA only, attribute ID 197 |
+| `sensor.dw_<disk>_power_cycles` | count | Power cycle count |
+| `sensor.dw_<disk>_reallocated` | sectors | SATA, attribute ID 5 |
+| `sensor.dw_<disk>_pending` | sectors | SATA, attribute ID 197 |
+| `sensor.dw_<disk>_offline_uncorrectable` | sectors | SATA, attribute ID 198 |
+| `sensor.dw_<disk>_reported_uncorrectable` | errors | SATA, attribute ID 187 |
+| `sensor.dw_<disk>_reallocated_events` | count | SATA, attribute ID 196 |
+| `sensor.dw_<disk>_udma_crc_errors` | errors | SATA, attribute ID 199 |
+| `sensor.dw_<disk>_command_timeout` | count | SATA, attribute ID 188 |
 | `sensor.dw_<disk>_smart_errors` | count | SATA SMART error log entries |
-| `sensor.dw_<disk>_wear` | % | NVMe only, percentage used |
-| `sensor.dw_<disk>_media_errors` | count | NVMe only |
+| `sensor.dw_<disk>_wear` | % | NVMe percentage used |
+| `sensor.dw_<disk>_available_spare` | % | NVMe available spare |
+| `sensor.dw_<disk>_available_spare_threshold` | % | NVMe spare threshold |
+| `sensor.dw_<disk>_critical_warning` | count | NVMe critical warning flags (0 = healthy) |
+| `sensor.dw_<disk>_media_errors` | count | NVMe media/data integrity errors |
+| `sensor.dw_<disk>_unsafe_shutdowns` | count | NVMe unsafe shutdowns |
+| `sensor.dw_<disk>_num_err_log_entries` | count | NVMe error log entries |
+| `sensor.dw_<disk>_controller_busy_time` | duration | NVMe controller busy time, minutes |
+| `sensor.dw_<disk>_data_written` | data | NVMe host writes, TB |
+| `sensor.dw_<disk>_data_read` | data | NVMe host reads, TB |
 
-The health entity carries attributes: model, serial, device type, SMART result, firmware and (SATA) the full attribute registry when `publish_attributes` is on. Disks are grouped as MQTT devices, so the entities appear under one device each.
+Entity object ids derive from the kernel device name reported by smartctl, so a disk selected by `/dev/disk/by-id/...` still gets short ids like `dw_sda_*`. ATA-only and NVMe-only sensors are created only when reported data contains the relevant fields.
+
+The health entity carries attributes: device path, model, serial, device type, SMART result, firmware, capacity, rotation rate, form factor, protocol/SATA version and self-test status. With `publish_attributes` enabled it also carries the full ATA SMART attribute registry (id, name, value, worst, threshold, raw) and, for NVMe, the NVMe health log fields. Disks are grouped as MQTT devices by serial (or kernel name), so entities appear under one device in HA.
 
 Per power supply (`/sys/class/power_supply`, `Battery` and `UPS` types only):
 
@@ -44,7 +60,7 @@ Manual options (`mqtt_host`, `mqtt_port`, credentials) act as the fallback when 
 | `disks` | `[]` (auto) | Explicit device paths, e.g. `/dev/sda`. Empty list auto-discovers SATA and NVMe block devices, skipping virtual devices. |
 | `check_interval` | `300` | Seconds between SMART reads. |
 | `battery_interval` | `60` | Seconds between power supply reads. |
-| `publish_attributes` | `true` | Publish SMART attribute registry on the health entity. |
+| `publish_attributes` | `true` | Publish SMART attribute registry and extended disk details as health entity attributes. |
 | `mqtt_enabled` | `true` | Use MQTT discovery. |
 | `mqtt_host` | `core-mqtt` | Broker host. The MQTT core add-on resolves under this name inside HA OS. |
 | `mqtt_port` | `1883` | Broker port (plain TCP, no TLS). |

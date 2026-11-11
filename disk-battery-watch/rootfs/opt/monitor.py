@@ -197,10 +197,33 @@ def build_disk_entities(device, data, options):
             "device_type": device_type,
             "smart_result": result,
             "firmware": data.get("firmware_version"),
+            "rotation_rate": data.get("rotation_rate"),
+            "form_factor": (data.get("form_factor") or {}).get("name"),
+            "protocol": data.get("protocol"),
+            "sata_version": (data.get("sata_version") or {}).get("string"),
         }
+        capacity = (data.get("user_capacity") or {}).get("bytes")
+        if capacity is None and data.get("user_capacity"):
+            blocks = (data.get("user_capacity") or {}).get("blocks")
+            block_size = data.get("logical_block_size")
+            if blocks and block_size:
+                capacity = blocks * block_size
+        health_attrs["capacity_bytes"] = capacity
+        self_test = (
+            (data.get("ata_smart_data") or {})
+            .get("self_test", {})
+            .get("status", {})
+            .get("string")
+        )
+        if self_test:
+            health_attrs["self_test_status"] = self_test
+        ata_log = data.get("ata_smart_error_log", {}).get("summary", {})
+        if ata_log:
+            health_attrs["ata_error_log_count"] = ata_log.get("count")
         health_topic = f"{PREFIX}/attrs/{key}"
         registry = [
             {
+                "id": attr.get("id"),
                 "name": attr.get("name"),
                 "value": attr.get("value"),
                 "worst": attr.get("worst"),
@@ -213,6 +236,27 @@ def build_disk_entities(device, data, options):
         ]
         if registry:
             health_attrs["smart_attributes"] = registry
+        if nvme:
+            health_attrs["nvme"] = {
+                "critical_warning": nvme.get("critical_warning"),
+                "available_spare": nvme.get("available_spare"),
+                "available_spare_threshold": nvme.get("available_spare_threshold"),
+                "percentage_used": nvme.get("percentage_used"),
+                "data_units_read": nvme.get("data_units_read"),
+                "data_units_written": nvme.get("data_units_written"),
+                "host_reads": nvme.get("host_reads"),
+                "host_writes": nvme.get("host_writes"),
+                "controller_busy_time": nvme.get("controller_busy_time"),
+                "power_cycles": nvme.get("power_cycles"),
+                "power_on_hours": nvme.get("power_on_hours"),
+                "unsafe_shutdowns": nvme.get("unsafe_shutdowns"),
+                "media_errors": nvme.get("media_errors"),
+                "num_err_log_entries": nvme.get("num_err_log_entries"),
+                "warning_temp_time": nvme.get("warning_temp_time"),
+                "critical_comp_time": nvme.get("critical_comp_time"),
+            }
+        # prune nulls to keep attributes compact
+        health_attrs = {k: v for k, v in health_attrs.items() if v is not None}
     health_extra = {
         "device_class": "problem",
         "payload_on": "true",
@@ -255,6 +299,15 @@ def build_disk_entities(device, data, options):
         extra={"device_class": "duration", "unit_of_measurement": "h"},
     )
 
+    power_cycles = nvme.get("power_cycles") if nvme else raw_value(find_attribute(data, 12))
+    add(
+        "sensor",
+        "power_cycles",
+        "power cycle count",
+        power_cycles,
+        extra={"state_class": "total_increasing"},
+    )
+
     if nvme:
         add(
             "sensor",
@@ -265,11 +318,81 @@ def build_disk_entities(device, data, options):
         )
         add(
             "sensor",
+            "available_spare",
+            "available spare",
+            nvme.get("available_spare"),
+            extra={"unit_of_measurement": "%", "state_class": "measurement"},
+        )
+        add(
+            "sensor",
+            "available_spare_threshold",
+            "available spare threshold",
+            nvme.get("available_spare_threshold"),
+            extra={"unit_of_measurement": "%"},
+        )
+        add(
+            "sensor",
+            "critical_warning",
+            "critical warning",
+            nvme.get("critical_warning"),
+            extra={"state_class": "measurement"},
+        )
+        add(
+            "sensor",
             "media_errors",
             "media errors",
             nvme.get("media_errors", 0),
             extra={"state_class": "measurement"},
         )
+        add(
+            "sensor",
+            "unsafe_shutdowns",
+            "unsafe shutdowns",
+            nvme.get("unsafe_shutdowns"),
+            extra={"state_class": "total_increasing"},
+        )
+        add(
+            "sensor",
+            "num_err_log_entries",
+            "error log entries",
+            nvme.get("num_err_log_entries"),
+            extra={"state_class": "total_increasing"},
+        )
+        add(
+            "sensor",
+            "controller_busy_time",
+            "controller busy time",
+            nvme.get("controller_busy_time"),
+            extra={
+                "device_class": "duration",
+                "unit_of_measurement": "min",
+                "state_class": "total_increasing",
+            },
+        )
+        duw = nvme.get("data_units_written")
+        if duw is not None:
+            add(
+                "sensor",
+                "data_written",
+                "data written",
+                round(duw * 512000 / 1e12, 3),
+                extra={
+                    "unit_of_measurement": "TB",
+                    "state_class": "total_increasing",
+                },
+            )
+        dur = nvme.get("data_units_read")
+        if dur is not None:
+            add(
+                "sensor",
+                "data_read",
+                "data read",
+                round(dur * 512000 / 1e12, 3),
+                extra={
+                    "unit_of_measurement": "TB",
+                    "state_class": "total_increasing",
+                },
+            )
     else:
         registry = data.get("ata_smart_attributes", {}).get("registry")
         if registry:
@@ -286,6 +409,41 @@ def build_disk_entities(device, data, options):
                 "unresolved sectors",
                 raw_value(find_attribute(data, 197)),
                 extra={"unit_of_measurement": "sectors", "state_class": "measurement"},
+            )
+            add(
+                "sensor",
+                "offline_uncorrectable",
+                "offline uncorrectable sectors",
+                raw_value(find_attribute(data, 198)),
+                extra={"unit_of_measurement": "sectors", "state_class": "measurement"},
+            )
+            add(
+                "sensor",
+                "reported_uncorrectable",
+                "reported uncorrectable errors",
+                raw_value(find_attribute(data, 187)),
+                extra={"unit_of_measurement": "errors", "state_class": "measurement"},
+            )
+            add(
+                "sensor",
+                "udma_crc_errors",
+                "UDMA CRC errors",
+                raw_value(find_attribute(data, 199)),
+                extra={"unit_of_measurement": "errors", "state_class": "measurement"},
+            )
+            add(
+                "sensor",
+                "reallocated_events",
+                "reallocated event count",
+                raw_value(find_attribute(data, 196)),
+                extra={"state_class": "measurement"},
+            )
+            add(
+                "sensor",
+                "command_timeout",
+                "command timeouts",
+                raw_value(find_attribute(data, 188)),
+                extra={"state_class": "measurement"},
             )
             errors = (
                 data.get("ata_smart_error_log", {}).get("summary", {}).get("count")
